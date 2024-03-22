@@ -11,53 +11,57 @@ import com.airconsole.reservation.components.MenuItem;
 @Scope("singleton")
 public class SeatClassSelectionScreen extends Screen {
 
-	public static final Character SEAT_CLASS_SELECTION_ID = 'R';
-	public static final Character EXIT_SELECTION_ID = 'X';
+    public static final Character BUSINESS_CLASS_SELECTION_ID = 'B';
+    public static final Character ECONOMY_CLASS_SELECTION_ID = 'E';
+    public static final Character EXIT_SELECTION_ID = 'X';
 
-	@Autowired
-	private final EconomySeatSelectionScreen _economySeatSelectionScreen;
-	@Autowired
-	private final BusinessSeatSelectionScreen _businessSeatSelectionScreen;
+    @Autowired
+    private final EconomySeatSelectionScreen _economySeatSelectionScreen;
+    @Autowired
+    private final BusinessSeatSelectionScreen _businessSeatSelectionScreen;
 
-	public SeatClassSelectionScreen(final EconomySeatSelectionScreen economySeatSelectionScreen,
-			final BusinessSeatSelectionScreen businessSeatSelectionScreen) {
-		_businessSeatSelectionScreen = businessSeatSelectionScreen;
-		_economySeatSelectionScreen = economySeatSelectionScreen;
+    public SeatClassSelectionScreen(final EconomySeatSelectionScreen economySeatSelectionScreen,
+            final BusinessSeatSelectionScreen businessSeatSelectionScreen) {
 
-		setTitle("Seat Class");
+        _businessSeatSelectionScreen = businessSeatSelectionScreen;
+        _economySeatSelectionScreen = economySeatSelectionScreen;
 
-		Menu menu = new Menu();
+        setTitle("Seat Class");
 
-		menu.setTitle("Seat Class Selection:");
-		menu.setPrompt("Please enter the seat class you want to reserve: ");
+        Menu menu = new Menu();
 
-		menu.addMenuItem(new MenuItem(BusinessSeatSelectionScreen.BUSINESS_CLASS_SELECTION_ID, "Business Class",
-				_businessSeatSelectionScreen::execute));
-		menu.addMenuItem(new MenuItem(EconomySeatSelectionScreen.ECONOMY_CLASS_SELECTION_ID, "Economy Class",
-				_economySeatSelectionScreen::execute));
-		menu.addMenuItem(new MenuItem(EXIT_SELECTION_ID, "Exit the System", () -> {
-			System.exit(0);
-		}));
+        menu.setTitle("Seat Class Selection:");
+        menu.setPrompt("Please enter the seat class you want to reserve: ");
 
-		setMenu(menu);
-	}
+        menu.addMenuItem(
+                new MenuItem(BUSINESS_CLASS_SELECTION_ID, "Business Class", _businessSeatSelectionScreen::execute));
+        menu.addMenuItem(
+                new MenuItem(ECONOMY_CLASS_SELECTION_ID, "Economy Class", _economySeatSelectionScreen::execute));
+        menu.addMenuItem(new MenuItem(EXIT_SELECTION_ID, "Exit the System", () -> {
 
-	@Override
-	public void execute() {
+            System.exit(0);
+        }));
 
-		drawHeader();
+        setMenu(menu);
+    }
 
-		if (menu != null)
-			menu.execute();
-		else
-			System.err.println("SeatClassSelectionScreen menu is NULL");
-	}
+    @Override
+    public void execute() {
 
-	@Override
-	protected void drawHeader() {
-		System.out.println("*******************************");
-		System.out.println("********  " + getTitle() + "  *********");
-		System.out.println("*******************************");
-	}
+        drawHeader();
+
+        if (menu != null)
+            menu.execute();
+        else
+            System.err.println("SeatClassSelectionScreen menu is NULL");
+    }
+
+    @Override
+    protected void drawHeader() {
+
+        System.out.println("*******************************");
+        System.out.println("********  " + getTitle() + "  *********");
+        System.out.println("*******************************");
+    }
 
 }

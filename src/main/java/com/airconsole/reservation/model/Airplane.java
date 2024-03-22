@@ -1,106 +1,89 @@
 package com.airconsole.reservation.model;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.airconsole.reservation.controller.FileExistenceChecker;
+import com.airconsole.reservation.data.SeatMapHandler;
 
 @Component
 public class Airplane {
 
-	private char[][] planeSeatMap;
+    private Seat[][] _planeSeatMap;
 
-	public enum PlaneClass {
-		BUSINESS_CLASS, ECONOMY_CLASS,
-	}
+//	private Set<String> occupiedSeats; ccupiedSeats = new HashSet<>();
+    @Autowired
+    private SeatMapHandler _seatMapHandler;
 
-	public static final int TOTAL_PLANE_ROWS = 8;
-	public static final int TOTAL_PLANE_COL = 5;
+    public enum PlaneClass {
+        BUSINESS_CLASS, ECONOMY_CLASS,
+    }
 
-	public static final int BUSINESS_CLASS_FIRST_PLANE_ROW = 1;
-	public static final int BUSINESS_CLASS_LAST_PLANE_ROW = 5;
-	public static final int ECONOMY_CLASS_FIRST_PLANE_ROW = 6;
+    public static final int TOTAL_PLANE_ROWS = 8;
+    public static final int TOTAL_PLANE_COL = 5;
 
-	private final String[] _planeColumns = { "A", "B", "C", "D", "E" };
+    public static final int BUSINESS_CLASS_FIRST_PLANE_ROW = 1;
+    public static final int BUSINESS_CLASS_LAST_PLANE_ROW = 5;
+    public static final int ECONOMY_CLASS_FIRST_PLANE_ROW = 6;
 
-	public Airplane() {
-		_loadPlaneSeatMap();
-	}
+    public static final char[] PLANE_COLUMNS = {
+            'A', 'B', 'C', 'D', 'E' };
 
-	public void printReservationMap(final PlaneClass selectedClass) {
+    public Airplane(SeatMapHandler seatMapHandler) {
 
-		if (planeSeatMap == null || planeSeatMap.length == 0) {
-			System.err.println("Error printing matrix. There is no Airplane information");
-			System.exit(1);
-		}
+        _seatMapHandler = seatMapHandler;
+        _planeSeatMap = _seatMapHandler.loadSeatMap();
 
-		// print plan columns
-		for (String planeColumn : _planeColumns) {
-			System.out.print("\t" + planeColumn);
-		}
+        if (_planeSeatMap == null)
+            _planeSeatMap = seatMapHandler.initialiseSeatMap(TOTAL_PLANE_ROWS, PLANE_COLUMNS);
+    }
 
-		int startingPlaneRowAccordingToClass = (selectedClass == PlaneClass.BUSINESS_CLASS)
-				? BUSINESS_CLASS_FIRST_PLANE_ROW
-				: ECONOMY_CLASS_FIRST_PLANE_ROW;
+    public boolean isSeatAvailable(Seat selectedSeat) {
 
-		// Loop through each row
-		for (int row = startingPlaneRowAccordingToClass - 1; row < TOTAL_PLANE_ROWS; row++) {
+        return !_planeSeatMap[selectedSeat.getRow() - 1][selectedSeat.getColumn() - PLANE_COLUMNS[0]].isBooked();
+    }
 
-			// Determine the last row based on the selected class
-			int lastRow = (selectedClass == PlaneClass.BUSINESS_CLASS) ? BUSINESS_CLASS_LAST_PLANE_ROW
-					: TOTAL_PLANE_ROWS;
+    public void bookSeat(Seat selectedSeat) {
 
-			// Print Row Numbers
-			System.out.print(row + 1);
+        _planeSeatMap[selectedSeat.getRow() - 1][selectedSeat.getColumn() - PLANE_COLUMNS[0]] = selectedSeat;
 
-			for (int col = 0; col < lastRow; col++) {
-				// Print the current element followed by a tab
-				System.out.print("\t" + planeSeatMap[row][col]);
-			}
+        _seatMapHandler.storeSeatMap(_planeSeatMap);
+    }
 
-			// Move to the next line after printing all columns in the row
-			System.out.println();
-		}
+    public Seat getSeat(int row, char column) {
 
-	}
+        return (_planeSeatMap[row - 1][column - PLANE_COLUMNS[0]]);
+    }
 
-	private static final String COMMON_FILE_DELIMITER = ",";
+    public void displayPlaneSeatMap(final PlaneClass selectedClass) {
 
-	private char[][] _loadPlaneSeatMap() {
-		planeSeatMap = new char[TOTAL_PLANE_ROWS][TOTAL_PLANE_COL];
+        // print plan columns
+        for (char planeColumn : PLANE_COLUMNS) {
 
-		if (!FileExistenceChecker.check(planeSeatReservationMapFilename)) {
-			for (int row = 0; row < TOTAL_PLANE_ROWS; row++) {
-				for (int seat = 0; seat < TOTAL_PLANE_COL; seat++) {
-					planeSeatMap[row][seat] = Seat.EMPTY_SEAT_ID;
-				}
-			}
-		} else { // load existing reservation
+            System.out.print("\t" + planeColumn);
+        }
+        System.out.println("");
 
-			try (BufferedReader reader = new BufferedReader(new FileReader(planeSeatReservationMapFilename))) {
+        int startingPlaneRowAccordingToClass = (selectedClass == PlaneClass.BUSINESS_CLASS)
+                ? BUSINESS_CLASS_FIRST_PLANE_ROW
+                : ECONOMY_CLASS_FIRST_PLANE_ROW;
 
-				// Read lines from the file and parse matrix elements
-				String line;
-				int row = 0;
+        // Determine the last row based on the selected class
+        int lastRow = (selectedClass == PlaneClass.BUSINESS_CLASS) ? BUSINESS_CLASS_LAST_PLANE_ROW : TOTAL_PLANE_ROWS;
 
-				while ((line = reader.readLine()) != null) {
-					String[] elements = line.trim().split(COMMON_FILE_DELIMITER);
+        // Loop through each row
+        for (int row = startingPlaneRowAccordingToClass - 1; row < lastRow; row++) {
 
-					for (int col = 0; col < elements.length; col++) {
-						planeSeatMap[row][col] = elements[col].charAt(0);
-					}
-					row++;
-				}
-			} catch (IOException | NumberFormatException e) {
-				System.out.println("Error loading planeSeatReservation file: " + e.getMessage());
-				System.exit(1);
-			}
-		}
+            // Print Row Numbers
+            System.out.print(row + 1);
 
-		return planeSeatMap;
-	}
+            for (int col = 0; col < PLANE_COLUMNS.length; col++) {
 
+                // Print the current element followed by a tab
+                System.out.print(
+                        "\t" + (_planeSeatMap[row][col].isBooked() ? Seat.OCCUPIED_SEAT_ID : Seat.EMPTY_SEAT_ID));
+            }
+            // Move to the next line after printing all columns in the row
+            System.out.println("");
+        }
+    }
 }

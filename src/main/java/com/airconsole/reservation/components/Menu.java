@@ -4,53 +4,51 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-import org.springframework.stereotype.Component;
-
 import com.airconsole.reservation.interfaces.ICommand;
 
-@Component
 public class Menu implements ICommand {
 
-	private String title;
-	private String prompt;
-	private Map<Character, MenuItem> menuItems = new HashMap<Character, MenuItem>();
-	private Scanner scanner = new Scanner(System.in);
+	private String _title;
+	private String _prompt;
+
+	private Map<Character, MenuItem> _menuItems = new HashMap<Character, MenuItem>();
+	private Scanner _scanner = new Scanner(System.in);
 
 	public String getTitle() {
-		return title;
+		return _title;
 	}
 
 	public void setTitle(String title) {
-		this.title = title;
+		this._title = title;
 	}
 
 	public String getPrompt() {
-		return prompt;
+		return _prompt;
 	}
 
 	public void setPrompt(String prompt) {
-		this.prompt = prompt;
+		this._prompt = prompt;
 	}
 
 	public Map<Character, MenuItem> getMenuItems() {
-		return menuItems;
+		return _menuItems;
 	}
 
 	public void addMenuItem(MenuItem menuItem) {
-		this.menuItems.put(Character.toUpperCase(menuItem.getShortcut()), menuItem);
+		this._menuItems.put(Character.toUpperCase(menuItem.getShortcut()), menuItem);
 	}
 
 	@Override
 	public void execute() {
 		boolean userSelectionMade = false;
 
-		System.out.println(getTitle());
-		System.out.println("");
+		if (_title != null) {
+			System.out.println(_title);
+			System.out.println("");
+		}
 
-		for (Map.Entry<Character, MenuItem> entry : menuItems.entrySet()) {
-			Character key = entry.getKey();
-			MenuItem menuItem = entry.getValue();
-			System.out.println(menuItem);
+		for (Map.Entry<Character, MenuItem> entry : _menuItems.entrySet()) {
+			System.out.println(entry.getValue());
 		}
 
 		System.out.println("");
@@ -58,7 +56,7 @@ public class Menu implements ICommand {
 
 		while (!userSelectionMade) {
 
-			Character userInput = scanner.next().charAt(0);
+			Character userInput = _scanner.next().charAt(0);
 
 			if (getMenuItems().containsKey(Character.toUpperCase(userInput))) {
 				userSelectionMade = true;

@@ -1,50 +1,54 @@
 package com.airconsole.reservation.screens;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.airconsole.reservation.components.Menu;
 import com.airconsole.reservation.model.Airplane;
+import com.airconsole.reservation.model.Passenger;
+import com.airconsole.reservation.model.Seat;
 
 @Service
 @Scope("singleton")
 public class BusinessSeatSelectionScreen extends SeatSelectionScreen {
 
-	public static final Character BUSINESS_CLASS_SELECTION_ID = 'B';
-	public static final Character EXIT_SELECTION_ID = 'X';
+    public BusinessSeatSelectionScreen(final Airplane airplane) {
 
-	@Autowired
-	private final Airplane _airplane;
+        super(airplane, "Business Class");
+    }
 
-	public BusinessSeatSelectionScreen(final Airplane airplane) {
-		_airplane = airplane;
+    @Override
+    public void execute() {
 
-		setTitle("Business Class");
+        drawHeader();
 
-		_airplane.printReservationMap(Airplane.PlaneClass.BUSINESS_CLASS);
+        _airplane.displayPlaneSeatMap(Airplane.PlaneClass.BUSINESS_CLASS);
 
-		Menu menu = new Menu();
+        Seat selectedSeat = getSeatSelection(Airplane.BUSINESS_CLASS_FIRST_PLANE_ROW - 1,
+                Airplane.BUSINESS_CLASS_LAST_PLANE_ROW - 1);
 
-		setMenu(menu);
-	}
+        if (_airplane.isSeatAvailable(selectedSeat)) {
 
-	@Override
-	public void execute() {
+            System.out.println("\nSeat " + selectedSeat.getRow() + selectedSeat.getColumn() + " is available.");
 
-		drawHeader();
+            Passenger passenger = getPassangerInfo();
+            // save seat
+            selectedSeat.book(passenger);
+            _airplane.bookSeat(selectedSeat);
 
-		if (menu != null)
-			menu.execute();
-		else
-			System.err.println("BusinessSeatSelectionScreen menu is NULL");
-	}
+            System.out.println(
+                    "\nSeat " + selectedSeat.getRow() + selectedSeat.getColumn() + " was successfully booked!");
+        } else {
 
-	@Override
-	protected void drawHeader() {
-		System.out.println("*******************************");
-		System.out.println("***** " + getTitle() + "  ****");
-		System.out.println("*******************************");
-	}
+            System.out
+                    .println("\nSorry seat " + selectedSeat.getRow() + selectedSeat.getColumn() + " is already taken.");
+        }
+    }
 
+    @Override
+    protected void drawHeader() {
+
+        System.out.println("\r\n*******************************");
+        System.out.println("******* " + getTitle() + "  *******");
+        System.out.println("*******************************\r\n");
+    }
 }

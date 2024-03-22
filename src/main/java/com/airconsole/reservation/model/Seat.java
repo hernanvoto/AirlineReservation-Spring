@@ -3,55 +3,67 @@ package com.airconsole.reservation.model;
 import java.io.Serializable;
 
 public class Seat implements Serializable {
-	public static final char EMPTY_SEAT_ID = 'E';
-	public static final char OCCUPIED_SEAT_ID = 'X';
-  
-	private static final long serialVersionUID = 6287922474113391944L;
-	
-	private Integer seatRow = null;
-	private String seatColumnLetter = null;
-	
-	public Integer getSeatRow() {
-		return seatRow;
-	}
-	
-	public void setSeatRow(Integer seatRow) {
-		this.seatRow = seatRow;
-	}
-	
-	public String getSeatColumnLetter() {
-		return seatColumnLetter;
-	}
-	
-	public void setSeatColumnLetter(String seatColumnLetter) {
-		this.seatColumnLetter = seatColumnLetter.toUpperCase();
-	}
-	
-	public String asHashMapKey() {
-		return seatRow + seatColumnLetter;
-	}
 
-	public Integer getSeatRowNumberForStorage() {
-		return seatRow - 1;
-	}
-	
-	public Integer getSeatColumnNumberForStorage() {
-//		Integer seatLetterNumber; 
-		if (seatColumnLetter != null && !seatColumnLetter.isBlank()){
-			  switch (seatColumnLetter.toUpperCase()) {
-				case "A" :
-					return 0;
-				case "B": 
-					return 1;
-				case "C":
-					return 2;
-				case "D":
-					return 3;
-				case "E":
-					return 4;
-			  }
-		}
-		
-		return -1;
-	}	
+    public static final char EMPTY_SEAT_ID = '-';
+    public static final char OCCUPIED_SEAT_ID = 'X';
+
+    private static final long serialVersionUID = 6287922474113391944L;
+
+    private int _row;
+    private char _column;
+    private Passenger _passenger;
+    private boolean _booked;
+
+    public Seat(int seatRow, char seatColumn) {
+
+        _row = seatRow;
+        _column = seatColumn;
+        _booked = false;
+    }
+
+    public int getRow() {
+
+        return _row;
+    }
+
+    public void setRow(int row) {
+
+        this._row = row;
+    }
+
+    public char getColumn() {
+
+        return _column;
+    }
+
+    public void setColumn(char column) {
+
+        this._column = column;
+    }
+
+    public void book(Passenger passenger) {
+
+        this._booked = true;
+        setPassenger(passenger);
+    }
+
+    public void unbook() {
+
+        this._booked = false;
+    }
+
+    public boolean isBooked() {
+
+        return _booked;
+    }
+
+    public Passenger getPassenger() {
+
+        return _passenger;
+    }
+
+    public void setPassenger(Passenger _passenger) {
+
+        this._passenger = _passenger;
+    }
 }

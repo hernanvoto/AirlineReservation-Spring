@@ -10,50 +10,56 @@ import com.airconsole.reservation.components.MenuItem;
 @Service
 @Scope("singleton")
 public class MainScreen extends Screen {
-	public static final Character EXIT_SELECTION_ID = 'X';
 
-	@Autowired
-	private final SeatClassSelectionScreen _seatClassSelectionScreen;
-	@Autowired
-	private final SeatVerificationScreen _seatVerificationScreen;
+    public static final Character SEAT_CLASS_SELECTION_ID = 'R';
+    public static final Character SEAT_VERIFICATION_SELECTION_ID = 'S';
+    public static final Character EXIT_SELECTION_ID = 'X';
 
-	public MainScreen(final SeatClassSelectionScreen seatClassSelectionScreen,
-			final SeatVerificationScreen seatVerificationScreen) {
-		_seatClassSelectionScreen = seatClassSelectionScreen;
-		_seatVerificationScreen = seatVerificationScreen;
+    @Autowired
+    private final SeatClassSelectionScreen _seatClassSelectionScreen;
+    @Autowired
+    private final SeatVerificationScreen _seatVerificationScreen;
 
-		setTitle("Airconsole");
+    public MainScreen(final SeatClassSelectionScreen seatClassSelectionScreen,
+            final SeatVerificationScreen seatVerificationScreen) {
 
-		Menu menu = new Menu();
+        _seatClassSelectionScreen = seatClassSelectionScreen;
+        _seatVerificationScreen = seatVerificationScreen;
 
-		menu.setTitle("Task Selection");
-		menu.setPrompt("Please enter the task you want to perform: ");
+        setTitle("Airconsole");
 
-		menu.addMenuItem(new MenuItem(SeatClassSelectionScreen.SEAT_CLASS_SELECTION_ID, "Reservation",
-				_seatClassSelectionScreen::execute));
-		menu.addMenuItem(new MenuItem(SeatVerificationScreen.SEAT_VERIFICATION_SELECTION_ID, "Seat Verification",
-				_seatVerificationScreen::execute));
-		menu.addMenuItem(new MenuItem(EXIT_SELECTION_ID, "Exit the System", () -> {
-			System.exit(0);
-		}));
+        Menu menu = new Menu();
 
-		setMenu(menu);
-	}
+        menu.setTitle("Task Selection");
+        menu.setPrompt("Please enter the task you want to perform: ");
 
-	@Override
-	public void execute() {
-		drawHeader();
+        menu.addMenuItem(new MenuItem(SEAT_CLASS_SELECTION_ID, "Reservation", _seatClassSelectionScreen::execute));
+        menu.addMenuItem(
+                new MenuItem(SEAT_VERIFICATION_SELECTION_ID, "Seat Verification", _seatVerificationScreen::execute));
+        menu.addMenuItem(new MenuItem(EXIT_SELECTION_ID, "Exit the System", () -> {
 
-		if (menu != null)
-			menu.execute();
-		else
-			System.err.println("MainScreen menu is NULL!");
-	}
+            System.exit(0);
+        }));
 
-	@Override
-	protected void drawHeader() {
-		System.out.println("*******************************");
-		System.out.println("**    Welcome to " + getTitle() + "  **");
-		System.out.println("*******************************");
-	}
+        setMenu(menu);
+    }
+
+    @Override
+    public void execute() {
+
+        drawHeader();
+
+        if (menu != null)
+            menu.execute();
+        else
+            System.err.println("MainScreen menu is NULL!");
+    }
+
+    @Override
+    protected void drawHeader() {
+
+        System.out.println("\r\n*******************************");
+        System.out.println("**    Welcome to " + getTitle() + "  **");
+        System.out.println("*******************************");
+    }
 }
